@@ -1,0 +1,738 @@
+Print["GrapheneNanoscroll.nb.txt"];
+Print["Copy the whole text to a Wolfram Mathematica 6+ notebook and \
+run"];
+Print[" Andrei Siahlo \
+(http://physics.bsu.by/sites/all/other/info/Filindex.php?k=11&p=p&id=\
+258)"];
+Print["------------------------------------------------------------------------"\
+];
+
+Print["I. All Input Parameters --------------"];
+Print["I.2. Input Debug Parameters ----------"];
+DebugFindPhiOutLeqLv = False;
+DebugLoop = 0;  (*0 - default*)
+DebugExportATK = False;
+DebugExportHyperChem = 0;
+Print["I.1. Parameters of the Nanoribbon and the Graphene Scroll"];
+Print["nL71 - the number of the cells along the Length of the Scroll \
+"];
+nL71 = 71;
+Print["nW7 - the number of the cell along the Width of the Scroll"];
+nW7 = 7;
+
+Rinp = 1.155 nm;
+Rinp = 1.1 nm;
+
+Print["Rinp - the inner Radius of the Scroll, Rin = ", Rinp];
+Print["Nf3   the number of the graphene layers in the Scroll"];
+nf3 = 1;
+Print["---------------------(END OF THE INPUT)---------------"];
+Print["I.2.  Define the Names of Structures -----------------"];
+nLp = nL71;
+nWp = nW7;
+nHp = nf3;
+StructureNanoribbonName = 
+  StringJoin["Nanoribbon(", ToString[(nLp - 1)/2], ",", 
+   ToString[(nLp - 1)/2], ")_", ToString[(nLp - 1)], "zGN_", 
+   ToString[nWp - 1], "Lt"];
+StructureNanoscrollName = 
+  "GrapheneNanoscroll(35,35)_70zGNRH_5Lt_Rin2.3nm";
+StructureNanoscrollName = 
+  StringJoin["GrapheneNanoscroll(", ToString[(nLp - 1)/2], ",", 
+   ToString[(nLp - 1)/2], ")_", ToString[(nLp - 1)], "zGNRH_", 
+   ToString[nWp - 1], "Lt", "_Rin", ToString[Rinp/nm], "nm"];
+Print["I.3 Units ---------------------"];
+nm = 10.^(-9) m;
+AA = 0.1 nm;
+Print["I.4.Input Geometry constants --------------"];
+aCCp = 1.42 AA;
+aCFp = 1.091 AA;
+aCHp = 1.091 AA;
+aa = aCC 2 Sqrt[3];
+aap = aCCp 2 Sqrt[3];
+Print["aCC=", aCCp, "  aa=", aa "=", aap];
+Sa = (aCC^2) 3 Sqrt[3]/4;
+Sap = (aCCp^2) 3 Sqrt[3]/4;
+Print["Sa=", Sa, "=", Sap];
+h334 = N[0.334 nm];
+Print["h=", h334];
+Print["I.5  The Length and The Width of the Nanostructures \
+------------------------------"];
+Lp = ((nLp - 1) 1.5 + 1) aCCp;
+Print["        Nanoribbon Length = (", nLp - 1, 
+  "*1.5+1)aCC = (", (nLp - 1), "*1.5+1)*", aCCp/nm, "nm =", Lp/nm, 
+  "nm"];
+Print["        Nanoribbon Width = ", nWp, "*aa = ", nWp, "*", aap/nm, 
+  "nm = ", nWp aap/nm, "nm"];
+DzAtSiraleLen = nWp aap;
+Print["        Structure nAtoms = 2 nL nW nH = 2*", nLp, "*", nWp, 
+  "*", nHp, " = ", 2 nLp nWp nHp];
+nAtoms = 2 nLp nWp nHp;
+Print["I.6  ----Define the parameters for the \
+Visualization--------------"];
+RatomCA = 0.05 nm;
+RatomCB = 0.05 nm;
+RatomH = 0.025 nm;
+RatomF = 0.06 nm;
+RatomO = 0.07 nm;
+RatomN = 0.06 nm;
+ColorCA = Green;
+ColorCB = Yellow;
+ColorH = Blue;
+ColorF = Red;
+ColorN = LightGreen;
+ColorO = Orange;
+Print["I.7. -----------Output File Names"];
+OutputNanoribbonFileNameATK = 
+  ToFileName[NotebookDirectory[], 
+   StringJoin[StructureNanoribbonName, "ATK.pyAS.txt"]];
+OutputScrollFileNameATK = 
+  ToFileName[NotebookDirectory[], 
+   StringJoin[StructureNanoscrollName, "ATK.pyAS.txt"]];
+OutputScrollFileNameHyperChem = 
+  ToFileName[NotebookDirectory[], 
+   StringJoin[StructureNanoscrollName, "HCh.pdbAS.txt"]];
+(*OutputScrollFileNameHyperChemTab=ToFileName[NotebookDirectory[],\
+StringJoin[StructureNanoscrollName,"HChTab.pdbAS.txt"]];*)
+OutputNanoribbonFileNameHyperChemXYZ = 
+  ToFileName[NotebookDirectory[], 
+   StringJoin[StructureNanoribbonName, ".xyzAS.txt"]];
+OutputScrollFileNameHyperChemXYZ = 
+  ToFileName[NotebookDirectory[], 
+   StringJoin[StructureNanoscrollName, ".xyzAS.txt"]];
+OutputScrollFileNameHyperChemABHEqDistXYZ = 
+  ToFileName[NotebookDirectory[], 
+   StringJoin[StructureNanoscrollName, ".xyzABHEqDistAS.txt"]];
+
+OutputNanoribbonFileNameHyperChemGJF = 
+  ToFileName[NotebookDirectory[], 
+   StringJoin[StructureNanoribbonName, "AS.gjf.txt"]];
+OutputNanoribbonHFileNameHyperChemGJF = 
+  ToFileName[NotebookDirectory[], 
+   StringJoin[StructureNanoribbonName, "-H.AS.gjf.txt"]];
+OutputScrollFileNameHyperChemGJF = 
+  ToFileName[NotebookDirectory[], 
+   StringJoin[StructureNanoscrollName, ".AS.gjf.txt"]];
+OutputScrollFileNameHyperChemABHEqDistGJF = 
+  ToFileName[NotebookDirectory[], 
+   StringJoin[StructureNanoscrollName, "EqDistAS.gjf.txt"]];
+
+Print[];
+Print["I.8.   The considered Systems:"];
+Print[];
+Print["  + \
+---------------------------------------------------------"];
+Print["  |                                    "];
+Print["  |    STRUCTURE NANORIBBON NAME: ", StructureNanoribbonName];
+Print["  |    STRUCTURE SCROLL NAME: ", StructureNanoscrollName];
+Print["  |                                     "];
+Print["  + \
+--------------------------------------------------------"];
+lA = 1;
+lB = 2;
+iX = 1; iY = 2; iZ = 3;
+IL = 1; JW = 2; KH = 3;
+Print["II The Coordinates of the Atoms in the Nanoribbon ------"];
+Print["II.1. Initialize the Tables with the Coordinates of the \
+Nanoribbon Atoms"];
+NanoribbonAdXYZ = 
+  Table[{1., 1., 1.}, {iL, 1, nLp}, {jW, 1, nWp}, {kH, 1, nHp}];
+NanoribbonAuXYZ = 
+  Table[{1., 1., 1.}, {iL, 1, nLp}, {jW, 1, nWp}, {kH, 1, nHp}];
+NanoribbonBdXYZ = 
+  Table[{1., 1., 1.}, {iL, 1, nLp}, {jW, 1, nWp}, {kH, 1, nHp}];
+NanoribbonBuXYZ = 
+  Table[{1., 1., 1.}, {iL, 1, nLp}, {jW, 1, nWp}, {kH, 1, nHp}];
+Print["tiAtom[[iL,jW,kH,lAB]]  gives the index of Atom (iAtom-th)"];
+Print[" for the indexes {iL,jW,kH} and lAB=(1 for 'CA' and 2 for \
+'CB') of the loop"];
+tiAtom = Table[
+   1, {iL, 1, nLp}, {jW, 1, nWp}, {kH, 1, nHp}, {lAB, lA, lB}];
+Print["tijkABatom[[iAtom]] gives: A or B and the indexes iL,jW,kH of \
+the atoms"];
+tijkABatom = Table[{1, 1, 1, "CACB"}, {iAtom, 1, nAtoms}];
+tijkABHatom = Table[{1, 1, 1, "CACBH"}, {iAtom, 1, nAtoms}];
+
+Print["NanoribbonABdXYZ[[nLp,nWp,nHp,nAB]],NanoribbonABuXYZ[[nLp,nWp,\
+nHp,nAB]],"];
+NanoribbonABdXYZ = 
+  Table[{1. nm, 1. nm, 1. nm}, {iL, 1, nLp}, {jW, 1, nWp}, {kH, 1, 
+    nHp}, {lAB, 1, 2}];
+NanoribbonABuXYZ = 
+  Table[{1. nm, 1. nm, 1. nm}, {iL, 1, nLp}, {jW, 1, nWp}, {kH, 1, 
+    nHp}, {lAB, 1, 2}];
+
+Print["II.2. Calculate the Coordinates of the Nanoribbon Atoms \
+--------"];
+iAtom = 0;
+For[kH = 1, kH <= nHp, kH++, If[DebugLoop >= 3, Print["kH=", kH];];
+  For[jW = 1, jW <= nWp, jW++, If[DebugLoop == 1, Print["jW=", jW];];
+   For[iL = 1, iL <= nLp, iL++, If[DebugLoop, Print["iL=", iL]];
+    xAd = 
+     If[IntegerPart[(jW - 1)/2] == (jW - 1)/
+        2, (iL - 1) 1.5 aCCp, (iL - 1) 1.5 aCCp + 0.0 aCCp];
+    xAu = xAd;
+    yAd = 
+     If[IntegerPart[(iL - 1)/2] == (iL - 1)/
+        2, (jW - 1) (aap/2), (jW - 1) (aap/2) - 0.25 aap];
+    yAu = 
+     If[IntegerPart[(iL - 1)/2] == (iL - 1)/
+        2, (jW - 1) (aap/2), (jW - 1) (aap/2) + 0.25 aap];
+    zAd = h334 kH;
+    zAu = zAd;
+    If[IntegerPart[kH/2] != kH/2, xAd = xAd - 0.75 aCCp; 
+     xAu = xAu - 0.75 aCCp;
+     yAd + 1.25 aap;];
+    If[DebugLoop >= 300, 
+     Print["IntegerPart[kH/2]\[NotEqual]kH/2", 
+       IntegerPart[kH/2] != kH/2];];
+    If[DebugLoop == 1, 
+     Print["jW=", jW, ", yAd=", yAd, ",Even=", 
+      IntegerPart[(jW - 1)/2] == (jW - 1)/2]];
+    If[DebugLoop == 1, 
+     Print["yATrue=", (jW - 1) (aap/2), 
+      ", yAFalse=", (jW - 1) (aap/2) + aap/2.]];
+    xBd = xAd + aCCp;
+    yBd = yAd;
+    xBu = xAu + aCCp;
+    yBu = yAu;
+    zBd = zAd;
+    zBu = zAu;
+    If[DebugLoop, Print["{xAd,yAd,zAd}/aap=", {xAd, yAd, zAd}/aap]];
+    If[DebugLoop, Print["{xBd,yBd,zBd}/aap=", {xBd, yBd, zBd}/aap]];
+    (*NanoribbonAdXYZ[[iL,jW,kH]]={xAd,yAd,zAd};
+    NanoribbonAuXYZ[[iL,jW,kH]]={xAu,yAu,zAd};
+    NanoribbonBdXYZ[[iL,jW,kH]]={xBd,yBd,zBd};
+    NanoribbonBuXYZ[[iL,jW,kH]]={xBu,yBu,zBd};*)
+    iAtom++;
+    lAB = lA;
+    NanoribbonABdXYZ[[iL, jW, kH, lAB]] = {xAd, yAd, zAd};
+    NanoribbonABuXYZ[[iL, jW, kH, lAB]] = {xAu, yAu, zAu};
+    tiAtom[[iL, jW, kH, lAB]] = iAtom;
+    tijkABatom[[iAtom]] = {iL, jW, kH, "CA"};
+    
+    iAtom++;
+    lAB = lB;
+    NanoribbonABdXYZ[[iL, jW, kH, lAB]] = {xBd, yBd, zBd};
+    NanoribbonABuXYZ[[iL, jW, kH, lAB]] = {xBu, yBu, zBu};
+    tiAtom[[iL, jW, kH, lAB]] = iAtom;
+    tijkABatom[[iAtom]] = {iL, jW, kH, "CB"};
+    ];];];
+(*Clear[iL,jW,kH,xAd,yAd,zAd,xBd,yBd,zBd];*)
+Print["------------------------------------------------------------------------"\
+];
+Print["II.3.  Show the Nanoribbon  -----------"];
+m = 1.;
+Print[" Nanoribbon Atoms"];
+NanoribbonAtoms = 
+  Table[{Switch[tijkABatom[[tiAtom[[iL, jW, kH, lAB]]]][[4]], "CA", 
+     ColorCA, "CB", ColorCB, "H", ColorH, "F", ColorF, "O", ColorO, 
+     "N", ColorN], 
+    Sphere[NanoribbonABdXYZ[[iL, jW, kH, lAB]], 
+     Switch[tijkABatom[[tiAtom[[iL, jW, kH, lAB]]]][[4]], "CA", 
+      RatomCA, "CB", RatomCB, "H", RatomH, "F", RatomF, "O", RatomO, 
+      "N", RatomN]]}, {iL, nLp}, {jW, nWp - 1}, {kH, nHp}, {lAB, 2}];
+Print[Graphics3D[NanoribbonAtoms]];
+NanoribbonLinesABd = 
+  Table[Line[{NanoribbonABdXYZ[[iL, jW, kH, lA]], 
+     NanoribbonABdXYZ[[iL, jW, kH, lB]]}], {iL, nLp}, {jW, 
+    nWp - 1}, {kH, nHp}];
+NanoribbonLinesABm1d = 
+  Table[Line[{NanoribbonABdXYZ[[iL, jW, kH, lA]], 
+     NanoribbonABdXYZ[[iL - 1, jW, kH, lB]]}], {iL, 2, nLp}, {jW, 
+    nWp - 1}, {kH, nHp}];
+NanoribbonLinesABm1u = 
+  Table[Line[{NanoribbonABuXYZ[[iL, jW, kH, lA]], 
+     NanoribbonABuXYZ[[iL - 1, jW, kH, lB]]}], {iL, 2, nLp}, {jW, 
+    nWp - 1}, {kH, nHp}];
+Print["NanoribbonLines.jpg"];
+Print[StringJoin[StructureNanoribbonName, "_Lines.jpg"]];
+NanoribbonLines = 
+  Graphics3D[{NanoribbonLinesABd, NanoribbonLinesABm1d, 
+    Transpose[Take[Transpose[NanoribbonLinesABm1u], nWp - 2]]}];
+Print[NanoribbonLines];
+Print[Graphics3D[{NanoribbonLinesABd, NanoribbonLinesABm1d}]];
+
+Print["------Export Nanoribbon Lines and Figure"];
+Print["NanoribbonLines.jpg"];
+Print[StringJoin[StructureNanoribbonName, "_Lines.jpg"]];
+Print[NanoribbonLines];
+Export[ToFileName[NotebookDirectory[], "NanoribbonLines.jpg"], 
+  NanoribbonLines];
+Export[ToFileName[NotebookDirectory[], 
+   StringJoin[StructureNanoribbonName, "_Lines.jpg"]], 
+  NanoribbonLines];
+
+Print["NanoribbonFigue.jpg"];
+Print[StringJoin[StructureNanoribbonName, "_Figure.jpg"]];
+NanoribbonFigure = 
+  Graphics3D[{NanoribbonLinesABd, NanoribbonLinesABm1d, 
+    Transpose[Take[Transpose[NanoribbonLinesABm1u], nWp - 2]], 
+    NanoribbonAtoms}];
+Print[NanoribbonFigure];
+Export[ToFileName[NotebookDirectory[], "NanoribbonFigure.jpg"], 
+  NanoribbonFigure];
+Export[ToFileName[NotebookDirectory[], 
+   StringJoin[StructureNanoribbonName, "_Figure.jpg"]], 
+  NanoribbonFigure];
+
+Print["II.4 Export the Coordinates of the Atoms of the Nanoribbon"];
+Print["Export Data in XYZ Format"];
+iAtom = 0;
+xyzString = Table["", {0}];
+gjfString = Table["", {0}];
+xyzString = Append[xyzString, ToString[nAtoms]];
+xyzString = Append[xyzString, ""];
+gjfString = Append[gjfString, "%"];
+gjfString = Append[gjfString, "#"];
+gjfString = Append[gjfString, " "];
+gjfString = Append[gjfString, ToString[ToString[nLp nWp 2 - 2 nLp]]];
+gjfString = Append[gjfString, " "];
+gjfString = Append[gjfString, "0 1 "];
+For[kH = 1, kH <= nHp, kH++, If[DebugLoop >= 1, Print["kH=", kH];];
+  For[jW = 1, jW <= nWp, jW++, If[DebugLoop >= 1, Print["jW=", jW];];
+   For[iL = 1, iL <= nLp, iL++, If[DebugLoop >= 1, Print["iL=", iL]];
+    iAtom++;
+    lAB = lA;
+    xyzStringAppending = 
+     StringJoin[
+      Switch[tijkABatom[[tiAtom[[iL, jW, kH, lAB]]]][[4]], "CA", 
+       "6\t", "CB", "6\t", "H", "1\t", "F", "9\t", "O", "8\t", "N", 
+       "7\t"], ToString[
+       CForm[(NanoribbonABdXYZ[[iL, jW, kH, lAB, iX]])/AA]], "\t", 
+      ToString[CForm[(NanoribbonABdXYZ[[iL, jW, kH, lAB, iY]])/AA]], 
+      "\t", ToString[
+       CForm[(NanoribbonABdXYZ[[iL, jW, kH, lAB, iZ]])/AA]]];
+    xyzString = Append[xyzString, xyzStringAppending];
+    If[Or[jW < nWp, iL == 2],
+     gjfStringAppending = xyzStringAppending;
+     gjfString = Append[gjfString, gjfStringAppending];
+     ];
+    iAtom++;
+    lAB = lB;
+    xyzStringAppending = 
+     StringJoin[
+      Switch[tijkABatom[[tiAtom[[iL, jW, kH, lAB]]]][[4]], "CA", 
+       "6\t", "CB", "6\t", "H", "1\t", "F", "9\t", "O", "8\t", "N", 
+       "7\t"], ToString[
+       CForm[(NanoribbonABdXYZ[[iL, jW, kH, lAB, iX]])/AA]], "\t", 
+      ToString[CForm[(NanoribbonABdXYZ[[iL, jW, kH, lAB, iY]])/AA]], 
+      "\t", ToString[
+       CForm[(NanoribbonABdXYZ[[iL, jW, kH, lAB, iZ]])/AA]]];
+    xyzString = Append[xyzString, xyzStringAppending];
+    If[Or[jW < nWp, iL == 2],
+     gjfStringAppending = xyzStringAppending;
+     gjfString = Append[gjfString, gjfStringAppending];
+     ];
+    ];];];
+Print[OutputNanoribbonFileNameHyperChemXYZ];
+Export[OutputNanoribbonFileNameHyperChemXYZ, xyzString];
+Print[OutputNanoribbonFileNameHyperChemGJF];
+Export[OutputNanoribbonFileNameHyperChemGJF, gjfString];
+m =.;
+
+Print["------------------------------------------------------------------------"\
+];
+Print["II.5. Change edge atoms to H  (Hydrogen)"];
+NanoribbonABHdXYZ = NanoribbonABdXYZ;
+tijkABHatom = tijkABatom;
+m = 1;
+For[kH = 1, kH <= nHp, kH++,
+  For[jW = 1, jW <= nWp, jW++,
+    iL1 = 1;
+    If[DebugLoop >= 3, Print["iL1=", iL1, "  jW=", jW, "  kH=", kH]];
+    If[DebugLoop >= 3, 
+     Print["tijkABHatom[[tijkABHatom[[tiAtom[[iL1,jW,kH,1]]]]]]=", 
+      tijkABHatom[[tiAtom[[iL1, jW, kH, 1]]]]]];
+    tijkABHatom[[tiAtom[[iL1, jW, kH, 
+         1]]]] = {tijkABHatom[[tiAtom[[iL1, jW, kH, 1]]]][[iX]], 
+      tijkABHatom[[tiAtom[[iL1, jW, kH, 2]]]][[iY]], 
+      tijkABHatom[[tiAtom[[iL1, jW, kH, 1]]]][[iZ]], "H"};
+    iLn = nLp;
+    tijkABHatom[[tiAtom[[iLn, jW, kH, 
+         2]]]] = {tijkABHatom[[tiAtom[[iLn, jW, kH, 2]]]][[iX]], 
+      tijkABHatom[[tiAtom[[iLn, jW, kH, 1]]]][[iY]], 
+      tijkABHatom[[tiAtom[[iLn, jW, kH, 2]]]][[iZ]], "H"};
+    "II.5.2 Change the distance from H-atom to the C-atom";
+    lAB1 = 1;
+    AtomH1X = NanoribbonABdXYZ[[iL1, jW, kH, lAB1]][[iX]];
+    AtomH1Y = NanoribbonABdXYZ[[iL1, jW, kH, lAB1]][[iY]];
+    AtomH1Z = NanoribbonABdXYZ[[iL1, jW, kH, lAB1]][[iZ]];
+    lAB2 = 2;
+    AtomC2X = NanoribbonABdXYZ[[iL1, jW, kH, lAB2]][[iX]];
+    AtomC2Y = NanoribbonABdXYZ[[iL1, jW, kH, lAB2]][[iY]];
+    AtomC2Z = NanoribbonABdXYZ[[iL1, jW, kH, lAB2]][[iZ]];
+    DAtomsCH = 
+     Sqrt[(AtomH1X - AtomC2X)^2 + (AtomH1Y - AtomC2Y)^2 + (AtomH1Z - 
+          AtomC2Z)^2];
+    If[DebugLoop >= 3, 
+     Print["jW=", jW, " DAtomsCH=", DAtomsCH/nm, "nm"];];
+    AtomH1XMod = AtomH1X + (AtomC2X - AtomH1X) (1 - aCHp/aCCp);
+    AtomH1YMod = AtomH1Y + (AtomC2Y - AtomH1Y) (1 - aCHp/aCCp);
+    AtomH1ZMod = AtomH1Z + (AtomC2Z - AtomH1Z) (1 - aCHp/aCCp);
+    NanoribbonABHdXYZ[[iL1, jW, kH, lAB1]] = {AtomH1XMod, AtomH1YMod, 
+      AtomH1ZMod};
+    lABnL = 2;
+    AtomHnLX = NanoribbonABdXYZ[[iLn, jW, kH, lABnL]][[iX]];
+    AtomHnLY = NanoribbonABdXYZ[[iLn, jW, kH, lABnL]][[iY]];
+    AtomHnLZ = NanoribbonABdXYZ[[iLn, jW, kH, lABnL]][[iZ]];
+    lABnLm1 = 1;
+    AtomCnLm1X = NanoribbonABdXYZ[[iLn, jW, kH, lABnLm1]][[iX]];
+    AtomCnLm1Y = NanoribbonABdXYZ[[iLn, jW, kH, lABnLm1]][[iY]];
+    AtomCnLm1Z = AtomHnLZ;
+    DAtomsCF = 
+     Sqrt[(AtomHnLX - AtomCnLm1X)^2 + (AtomHnLY - 
+          AtomCnLm1Y)^2 + (AtomHnLZ - AtomCnLm1Z)^2];
+    If[DebugLoop >= 3, 
+     Print["jW=", jW, " DAtomsCF=", DAtomsCF/nm, "nm"];];
+    "There are outside Atoms of spirale";
+    "aCHp/aCCp  for doping by 'H',   aCFp/aCCp  for doping by 'F'";
+    AtomHnLXMod = AtomHnLX + (AtomCnLm1X - AtomHnLX) (1 - aCHp/aCCp);
+    AtomHnLYMod = AtomHnLY + (AtomCnLm1Y - AtomHnLY) (1 - aCHp/aCCp);
+    AtomHnLZMod = AtomHnLZ + (AtomCnLm1Z - AtomHnLZ) (1 - aCHp/aCCp);
+    NanoribbonABHdXYZ[[iLn, jW, kH, lABnL]] = {AtomHnLXMod, 
+      AtomHnLYMod, AtomHnLZMod};
+    ];
+  ];
+Print["II.5.2 Export the Coordinates of the Atoms of the \
+Nanoribbon"];
+Print["Export Data in XYZ Format"];
+iAtom = 0;
+xyzString = Table["", {0}];
+gjfString = Table["", {0}];
+xyzString = Append[xyzString, ToString[nAtoms]];
+xyzString = Append[xyzString, ""];
+gjfString = Append[gjfString, "%"];
+gjfString = Append[gjfString, "#"];
+gjfString = Append[gjfString, " "];
+gjfString = Append[gjfString, ToString[ToString[nLp nWp 2 - 2 nLp]]];
+gjfString = Append[gjfString, " "];
+gjfString = Append[gjfString, "0 1 "];
+For[kH = 1, kH <= nHp, kH++, If[DebugLoop >= 1, Print["kH=", kH];];
+  For[jW = 1, jW <= nWp, jW++, If[DebugLoop >= 1, Print["jW=", jW];];
+   For[iL = 1, iL <= nLp, iL++, If[DebugLoop >= 1, Print["iL=", iL]];
+    iAtom++;
+    lAB = lA;
+    xyzStringAppending = 
+     StringJoin[
+      Switch[tijkABHatom[[tiAtom[[iL, jW, kH, lAB]]]][[4]], "CA", 
+       "6\t", "CB", "6\t", "H", "1\t", "F", "9\t", "O", "8\t", "N", 
+       "7\t"], ToString[
+       CForm[(NanoribbonABHdXYZ[[iL, jW, kH, lAB, iX]])/AA]], "\t", 
+      ToString[CForm[(NanoribbonABHdXYZ[[iL, jW, kH, lAB, iY]])/AA]], 
+      "\t", ToString[
+       CForm[(NanoribbonABHdXYZ[[iL, jW, kH, lAB, iZ]])/AA]]];
+    xyzString = Append[xyzString, xyzStringAppending];
+    If[Or[jW < nWp, iL == 2],
+     gjfStringAppending = xyzStringAppending;
+     gjfString = Append[gjfString, gjfStringAppending];
+     ];
+    iAtom++;
+    lAB = lB;
+    xyzStringAppending = 
+     StringJoin[
+      Switch[tijkABHatom[[tiAtom[[iL, jW, kH, lAB]]]][[4]], "CA", 
+       "6\t", "CB", "6\t", "H", "1\t", "F", "9\t", "O", "8\t", "N", 
+       "7\t"], 
+      ToString[CForm[(NanoribbonABHdXYZ[[iL, jW, kH, lAB, iX]])/AA]], 
+      "\t", ToString[
+       CForm[(NanoribbonABHdXYZ[[iL, jW, kH, lAB, iY]])/AA]], "\t", 
+      ToString[
+       CForm[(NanoribbonABHdXYZ[[iL, jW, kH, lAB, iZ]])/AA]]];
+    xyzString = Append[xyzString, xyzStringAppending];
+    If[Or[jW < nWp, iL == 2],
+     gjfStringAppending = xyzStringAppending;
+     gjfString = Append[gjfString, gjfStringAppending];
+     ];
+    ];];];
+Print[OutputNanoribbonHFileNameHyperChemGJF];
+Export[OutputNanoribbonHFileNameHyperChemGJF, xyzString];
+Print[OutputNanoribbonHFileNameHyperChemGJF];
+Export[OutputNanoribbonHFileNameHyperChemGJF, gjfString];
+Print[" Graphene Nanoscroll Atoms"];
+NanoribbonHAtoms = 
+  Table[{Switch[tijkABHatom[[tiAtom[[iL, jW, kH, lAB]]]][[4]], "CA", 
+     ColorCA, "CB", ColorCB, "H", ColorH, "F", ColorF, "O", ColorO, 
+     "N", ColorN], 
+    Sphere[NanoribbonABHdXYZ[[iL, jW, kH, lAB]], 
+     Switch[tijkABHatom[[tiAtom[[iL, jW, kH, lAB]]]][[4]], "CA", 
+      RatomCA, "CB", RatomCB, "H", RatomH, "F", RatomF, "O", RatomO, 
+      "N", RatomN]]}, {iL, nLp}, {jW, nWp - 1}, {kH, nHp}, {lAB, 2}];
+Print[Graphics3D[NanoribbonHAtoms]];
+m =.;
+
+Print["------------------------------------------------------------------------"\
+];
+Print["III  Graphene Nanoscroll -------------------"];
+Print["III.1  Formula for Spirale Length ----------"];
+Print["Spirale parameters:"];
+Print["h - step per \[Delta]\[CurlyPhi]=2\[Pi]"];
+Print["\[CurlyPhi]in - starting angle"];
+Print["\[CurlyPhi]out - outing angle"];
+Print["Spirale Length"];
+Print["SpiraleLen[\[CurlyPhi]in,\[CurlyPhi]out,h]=1/(4 \[Pi])h (-\
+\[CurlyPhi]in Sqrt[1+\[CurlyPhi]in^2]+\[CurlyPhi]out Sqrt[1+\
+\[CurlyPhi]out^2}-ArcSinh[\[CurlyPhi]in]+ArcSinh[\[CurlyPhi]out])"];
+fSpiraleLen[phiinv_, phioutv_, hv_] = 
+  1/(4 Pi) hv (-phiinv Sqrt[(1 + phiinv)^2] + 
+     phioutv Sqrt[(1 + phioutv)^2] - ArcSinh[phiinv] + 
+     ArcSinh[phioutv]);
+If[DebugLoop >= 1, 
+ Print["fSpiraleLen[2\[Pi],3\[Pi],0.334nm] = ", 
+   fSpiraleLen[2 Pi, 3 Pi, 0.334 nm]];]
+If[DebugFindPhiOutLeqLv, 
+  Print["The function \
+FuncLeqLv[\[CurlyPhi]inv_,\[CurlyPhi]outv_,Lv_,hv_]=N[fL[\[CurlyPhi]\
+inv,\[CurlyPhi]outv,hv]-Lv]"];];
+FuncLeqLv[phiinv_, phioutv_, Lv_, hv_] = 
+  N[fSpiraleLen[phiinv, phioutv, hv] - Lv];
+Print["The function fFindPhiOutLeqLv[phioutav,phioutbv,phiinv,Lv,hv]  \
+   "];
+fFindPhiOutLeqLv[phioutav_, phioutbv_, phiinv_, Lv_, 
+   hv_] := (a = phioutav;
+   b = phioutbv;
+   mtmp = m;
+   m = 1;
+   ya = N[FuncLeqLv[phiinv, a, Lv, hv]];
+   yb = N[FuncLeqLv[phiinv, b, Lv, hv]];
+   If[ya == 0, x1 = a; Return[a]];
+   If[yb == 0, x1 = b; Return[b]];
+   If[Sign[ya] == Sign[yb], 
+    Return["Error, Sign[ya]\[Equal]Sign[yb]"]];
+   For[iii = 1, iii <= 45, iii++, c = N[(a + b)/2];
+    yc = FuncLeqLv[phiinv, c, Lv, hv];
+    Condition1 = (Sign[yc] == Sign[ya]);
+    If[DebugFindPhiOutLeqLv, 
+     Print["DebugFindPhiOutLeqLv iii=", iii, "  a/(2\[Pi])=", 
+       a/(2 Pi), " b/(2\[Pi])=", b/(2 Pi), " c/(2\[Pi])=", c/(2 Pi), 
+       "  yc=", yc, " FuncLeqLv[phiinv,c,Lv,hv] =", 
+       FuncLeqLv[phiinv, c, Lv, hv]];];
+    If[DebugFindPhiOutLeqLv, 
+     Print["DebugFindPhiOutLeqLv {phiinv,c,Lv,hv} = ", {phiinv, c, Lv,
+         hv}];];
+    If[Condition1, (a = c;
+      ya = yc;)];
+    If[! Condition1, (b = c;
+      yb = N[yc];)];
+    x1 = c;];
+   m = mtmp;
+   Return[x1];);
+If[DebugFindPhiOutLeqLv, 
+  Print["DebugFindPhiOutLeqLv Check \
+fFindPhiOutLeqLv[phiouta,phioutb,phiin,L,h]"];];
+phiouttst = 
+  fFindPhiOutLeqLv[0.01 \[Pi], 200 \[Pi], 0.1 (2 Pi), 5.123 nm, 
+   3.34 nm];
+If[DebugFindPhiOutLeqLv, 
+  Print["DebugFindPhiOutLeqLv fFindPhiOutLeqLv[0.01 \[Pi],200 \
+\[Pi],0.0,5.123 nm,3.34 nm] = ", phiouttst, " = 2\[Pi]*", 
+    phiouttst/(2 Pi)];];
+
+Print["III.2 The parameters of the Scroll---------"];
+Print["Rinp - the inner radius of the Scroll Rin = ", Rinp/nm, "nm"];
+PhiInp = 2 Pi Rinp/h334;
+Print [" The inner angle of the Scroll  \[CurlyPhi]in = 2\[Pi] \
+Rin/h334 = ", PhiInp, " = 2\[Pi]*", PhiInp/(2 Pi)];
+PhiOutp = fFindPhiOutLeqLv[2 Pi 0.01, 2 Pi 500, PhiInp, Lp, h334];
+Print [" The outer angle of the Scroll  \[CurlyPhi]out = ", PhiOutp, 
+  " = 2\[Pi]*", PhiOutp/(2 Pi)];
+Print [" The outer radius of the Scroll  Rout = h334 \
+\[CurlyPhi]out/(2\[Pi])= ", h334 PhiOutp/(2 Pi)/nm, "nm"];
+Print["------------------------------------------------------------------------"\
+];
+m = 1;
+Print["III.2 Generate the Atom Coordinates in the graphene Scroll"];
+Print["III.2.1. Initialize the Coordinates of the Atoms"];
+Print["Init the tables with coordinates for the Graphene \
+Nanoscroll"];
+Print["GrapheneNanoscrollABdXYZ[[nLp,nWp,nHp,nAB]], \
+GrapheneNanoscrollABuXYZ[[nLp,nWp,nHp,nAB]],"];
+GrapheneNanoscrollABdXYZ = 
+  Table[{1. nm, 1. nm, 1. nm}, {iL, 1, nLp}, {jW, 1, nWp}, {kH, 1, 
+    nHp}, {lAB, 1, 2}];
+GrapheneNanoscrollABuXYZ = 
+  Table[{1. nm, 1. nm, 1. nm}, {iL, 1, nLp}, {jW, 1, nWp}, {kH, 1, 
+    nHp}, {lAB, 1, 2}];
+Print["  and GrapheneNanoscrollABHdEqDistXYZ[[nLp,nWp,nHp,lAB]]"];
+GrapheneNanoscrollABHdEqDistXYZ = GrapheneNanoscrollABdXYZ;
+GrapheneNanoscrollABHuEqDistXYZ = GrapheneNanoscrollABuXYZ;
+
+iAtom = 0;
+Print["III.3 Calculate the Coordinates of the Atoms in the Scroll"];
+For[kH = 1, kH <= nHp, kH++, If[DebugLoop >= 1, Print["kH=", kH];];
+  For[jW = 1, jW <= nWp, jW++, If[DebugLoop >= 1, Print["jW=", jW];];
+   For[iL = 1, iL <= nLp, iL++, If[DebugLoop >= 1, Print["iL=", iL]];
+    "II.2.1 First Step: xLA, xLB of Nanoribbon";
+    "Expression for xA in a Nanoribbon (Nanoribbon)";
+    " xLAB the distance along the 'Length' of the 'unfolded' spirale \
+for an A (B) atom";
+    "C1.1. Determine parameters for PhiAB,RspiraleAB";
+    "  (Expressions for xLA and xLB are the same as for xA and xB for \
+Graphene Nanoflake)";
+    xLA = 
+     If[IntegerPart[(jW - 1)/2] == (jW - 1)/
+        2, (iL - 1) 1.5 aCCp, (iL - 1) 1.5 aCCp + 0.0 aCCp];
+    xLB = xLA + aCCp;
+    PhiA = fFindPhiOutLeqLv[2 Pi 0.01, 2 Pi 500, PhiInp, xLA, h334];
+    RScrollA = PhiA h334/(2 Pi);
+    PhiB = fFindPhiOutLeqLv[2 Pi 0.01, 2 Pi 500, PhiInp, xLB, h334];
+    RScrollB = PhiB h334/(2 Pi);
+    "PhiA,PhiB, RScrollA,RScrollB Are found";
+    "The expressions for zAd,zAu,zBd,zBu are the same as for \
+yAd,yAu,yBd,yBu in Nanoribbon";
+    zAd = 
+     If[IntegerPart[(iL - 1)/2] == (iL - 1)/
+        2, (jW - 1) (aap/2), (jW - 1) (aap/2) - 0.25 aap];
+    zAu = 
+     If[IntegerPart[(iL - 1)/2] == (iL - 1)/
+        2, (jW - 1) (aap/2), (jW - 1) (aap/2) + 0.25 aap];
+    zBd = zAd;
+    zBu = zAu;
+    
+    "----lAB=LA----------------";
+    "(The first 'iAtom++' in the loop)";
+    iAtom++;
+    lAB = lA;
+    PhiAB = Switch[lAB, lA, PhiA, lB, PhiB];
+    RScrollAB = Switch[lAB, lA, RScrollA, lB, RScrollB];
+    xAB = RScrollAB Sin[PhiAB]; yAB = RScrollAB Cos[PhiAB];
+    zABd = Switch[lAB, lA, zAd, lB, zBd];
+    zABu = Switch[lAB, lA, zAu, lB, zBu];
+    GrapheneNanoscrollABdXYZ[[iL, jW, kH, lAB]] = {xAB, yAB, zABd};
+    GrapheneNanoscrollABuXYZ[[iL, jW, kH, lAB]] = {xAB, yAB, zABu};
+    
+    tiAtom[[iL, jW, kH, lAB]] = iAtom;
+    tijkABatom[[iAtom]] = {iL, jW, kH, "CA"};
+    
+    "----lAB=LB----------------";
+    "The second 'iAtom++' in the loop";
+    iAtom++;
+    lAB = lB;
+    "C1.2. Set PhiAB,RspiraleAB";
+    PhiAB = Switch[lAB, lA, PhiA, lB, PhiB];
+    RScrollAB = Switch[lAB, lA, RScrollA, lB, RScrollB];
+    
+    "C2. Set xAB, yAB, zAB for Graphene Nanoscroll (Varied \
+Distances)";
+    xAB = RScrollAB Sin[PhiAB]; yAB = RScrollAB Cos[PhiAB];
+    zABd = Switch[lAB, lA, zAd, lB, zBd]; 
+    zABu = Switch[lAB, lA, zAu, lB, zBu];
+    GrapheneNanoscrollABdXYZ[[iL, jW, kH, lAB]] = {xAB, yAB, zABd};
+    GrapheneNanoscrollABuXYZ[[iL, jW, kH, lAB]] = {xAB, yAB, zABu};
+    
+    tiAtom[[iL, jW, kH, lAB]] = iAtom;
+    tijkABatom[[iAtom]] = {iL, jW, kH, "CB"};
+    If[DebugLoop >= 3, 
+     Print["iAtom=", iAtom, "  tijkABHatom[[iAtom]]=", 
+       tijkABHatom[[iAtom]]];];
+    ];];];
+Print["------------------------------------------------------------------------"\
+];
+Print[" III.4. Show the Graphene Nanoscroll ----------"];
+Print[" Graphene Nanoscroll Atoms"];
+GrapheneNanoscrollAtoms = 
+  Table[{Switch[tijkABatom[[tiAtom[[iL, jW, kH, lAB]]]][[4]], "CA", 
+     ColorCA, "CB", ColorCB, "H", ColorH, "F", ColorF, "O", ColorO, 
+     "N", ColorN], 
+    Sphere[GrapheneNanoscrollABdXYZ[[iL, jW, kH, lAB]], 
+     Switch[tijkABatom[[tiAtom[[iL, jW, kH, lAB]]]][[4]], "CA", 
+      RatomCA, "CB", RatomCB, "H", RatomH, "F", RatomF, "O", RatomO, 
+      "N", RatomN]]}, {iL, nLp}, {jW, nWp - 1}, {kH, nHp}, {lAB, 2}];
+Print[Graphics3D[GrapheneNanoscrollAtoms]];
+GrapheneNanoscrollLinesABd = 
+  Table[Line[{GrapheneNanoscrollABdXYZ[[iL, jW, kH, lA]], 
+     GrapheneNanoscrollABdXYZ[[iL, jW, kH, lB]]}], {iL, nLp}, {jW, 
+    nWp - 1}, {kH, nHp}];
+GrapheneNanoscrollLinesABm1d = 
+  Table[Line[{GrapheneNanoscrollABdXYZ[[iL, jW, kH, lA]], 
+     GrapheneNanoscrollABdXYZ[[iL - 1, jW, kH, lB]]}], {iL, 2, 
+    nLp}, {jW, nWp - 1}, {kH, nHp}];
+GrapheneNanoscrollLinesABm1u = 
+  Table[Line[{GrapheneNanoscrollABuXYZ[[iL, jW, kH, lA]], 
+     GrapheneNanoscrollABuXYZ[[iL - 1, jW, kH, lB]]}], {iL, 2, 
+    nLp}, {jW, nWp - 1}, {kH, nHp}];
+Print["GrapheneNanoscrollLines.jpg"];
+Print[StringJoin[StructureNanoscrollName, 
+   "_GrapheneNanoscrollLines.jpg"]];
+GrapheneNanoscrollLines = 
+  Graphics3D[{GrapheneNanoscrollLinesABd, 
+    GrapheneNanoscrollLinesABm1d, 
+    Transpose[
+     Take[Transpose[GrapheneNanoscrollLinesABm1u], nWp - 2]]}];
+Print[GrapheneNanoscrollLines];
+Export[ToFileName[NotebookDirectory[], "GrapheneNanoscrollLines.jpg"],
+   GrapheneNanoscrollLines];
+Export[ToFileName[NotebookDirectory[], 
+   StringJoin[StructureNanoscrollName, 
+    "_GrapheneNanoscrollLines.jpg"]], GrapheneNanoscrollLines];
+Print["GrapheneNanoscrollFigure.jpg"];
+Print[StringJoin[StructureNanoscrollName, 
+   "_GrapheneNanoscrollFigure.jpg"]];
+GrapheneNanoscrollFigure = 
+  Graphics3D[{GrapheneNanoscrollLinesABd, 
+    GrapheneNanoscrollLinesABm1d, 
+    Transpose[Take[Transpose[GrapheneNanoscrollLinesABm1u], nWp - 2]],
+     GrapheneNanoscrollAtoms}];
+Print[GrapheneNanoscrollFigure];
+Export[ToFileName[NotebookDirectory[], 
+   "GrapheneNanoscrollFigure.jpg"], GrapheneNanoscrollFigure];
+Export[ToFileName[NotebookDirectory[], 
+   StringJoin[StructureNanoscrollName, 
+    "_GrapheneNanoscrollFigure.jpg"]], GrapheneNanoscrollFigure];
+Print["III.5 Export the Coordinates of the Atoms of the Nanoscroll"];
+Print["Export Data in XYZ Format"];
+iAtom = 0;
+xyzString = Table["", {0}];
+gjfString = Table["", {0}];
+xyzString = Append[xyzString, ToString[nAtoms]];
+xyzString = Append[xyzString, ""];
+gjfString = Append[gjfString, "%"];
+gjfString = Append[gjfString, "#"];
+gjfString = Append[gjfString, " "];
+gjfString = Append[gjfString, ToString[ToString[nLp nWp 2 - 2 nLp]]];
+gjfString = Append[gjfString, " "];
+gjfString = Append[gjfString, "0 1 "];
+For[kH = 1, kH <= nHp, kH++, If[DebugLoop >= 1, Print["kH=", kH];];
+  For[jW = 1, jW <= nWp, jW++, If[DebugLoop >= 1, Print["jW=", jW];];
+   For[iL = 1, iL <= nLp, iL++, If[DebugLoop >= 1, Print["iL=", iL]];
+    iAtom++;
+    lAB = lA;
+    xyzStringAppending = 
+     StringJoin[
+      Switch[tijkABatom[[tiAtom[[iL, jW, kH, lAB]]]][[4]], "CA", 
+       "6\t", "CB", "6\t", "H", "1\t", "F", "9\t", "O", "8\t", "N", 
+       "7\t"], ToString[
+       CForm[(GrapheneNanoscrollABdXYZ[[iL, jW, kH, lAB, iX]])/AA]], 
+      "\t", 
+      ToString[
+       CForm[(GrapheneNanoscrollABdXYZ[[iL, jW, kH, lAB, iY]])/AA]], 
+      "\t", ToString[
+       CForm[(GrapheneNanoscrollABdXYZ[[iL, jW, kH, lAB, iZ]])/AA]]];
+    xyzString = Append[xyzString, xyzStringAppending];
+    If[Or[jW < nWp, iL == 2],
+     gjfStringAppending = xyzStringAppending;
+     gjfString = Append[gjfString, gjfStringAppending];
+     ];
+    
+    iAtom++;
+    lAB = lB;
+    xyzStringAppending = 
+     StringJoin[
+      Switch[tijkABatom[[tiAtom[[iL, jW, kH, lAB]]]][[4]], "CA", 
+       "6\t", "CB", "6\t", "H", "1\t", "F", "9\t", "O", "8\t", "N", 
+       "7\t"], ToString[
+       CForm[(GrapheneNanoscrollABdXYZ[[iL, jW, kH, lAB, iX]])/AA]], 
+      "\t", ToString[
+       CForm[(GrapheneNanoscrollABdXYZ[[iL, jW, kH, lAB, iY]])/AA]], 
+      "\t", ToString[
+       CForm[(GrapheneNanoscrollABdXYZ[[iL, jW, kH, lAB, iZ]])/AA]]];
+    xyzString = Append[xyzString, xyzStringAppending];
+    If[Or[jW < nWp(*,iL==2*)],
+     gjfStringAppending = xyzStringAppending;
+     gjfString = Append[gjfString, gjfStringAppending];
+     ];
+    ];];];
+Print[OutputScrollFileNameHyperChemXYZ];
+Export[OutputScrollFileNameHyperChemXYZ, xyzString];
+Print[OutputScrollFileNameHyperChemGJF];
+Export[OutputScrollFileNameHyperChemGJF, gjfString];
