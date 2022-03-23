@@ -1,4 +1,3 @@
-# CarbonNanoscroll
 Carbon Nanoscroll
 
 Carbon Nanoscroll In Wolfram Mathematica
